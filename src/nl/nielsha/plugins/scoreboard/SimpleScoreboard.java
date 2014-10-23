@@ -18,17 +18,18 @@ import org.bukkit.scoreboard.Team;
 import com.google.common.base.Splitter;
 
 public class SimpleScoreboard {
-	
+
 	/**
 	 * Updated by Niels Hamelink
 	 * @author Niels Hamelink
 	 */
-	
+
 	private Scoreboard scoreboard;
 
 	private String title;
 	private Map<String, Integer> scores;
 	private List<Team> teams;
+	private Objective obj;
 
 	public SimpleScoreboard(String title) {
 		this.scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -47,7 +48,7 @@ public class SimpleScoreboard {
 
 	public void add(String text, Integer score) {
 		if(text.length() > 48){
-			 System.out.println("Text cannot be over 48 characters in length!");
+			System.out.println("Text cannot be over 48 characters in length!");
 		}
 		text = fixDuplicates(text);
 		scores.put(text, score);
@@ -86,12 +87,31 @@ public class SimpleScoreboard {
 		for (Map.Entry<String, Integer> text : scores.entrySet()) {
 			Map.Entry<Team, String> team = createTeam(text.getKey());
 			Integer score = text.getValue() != null ? text.getValue() : index;
-			OfflinePlayer player = Bukkit.getOfflinePlayer(team.getValue());
+			OfflinePlayer player = Bukkit.getPlayer(team.getValue());
 			if (team.getKey() != null){
 				team.getKey().addPlayer(player);
 			}
 			obj.getScore(player).setScore(score);
 			index -= 1;
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	public void update(String text, Integer score) {
+		if (scores.containsKey(text)) {
+			scores.put(text, score);
+			for (Team t : teams) {
+				if (t.getName() == text) {
+					t.unregister();
+				}
+			}
+
+			Map.Entry<Team, String> team = createTeam(text);
+			OfflinePlayer player = Bukkit.getOfflinePlayer(team.getValue());
+			if (team.getKey() != null)
+				team.getKey().addPlayer(player);
+			obj.getScore(player).setScore(score);
+
 		}
 	}
 
