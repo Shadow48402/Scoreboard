@@ -20,7 +20,12 @@ import org.bukkit.scoreboard.ScoreboardManager;
 
 public class Example extends JavaPlugin implements Listener {
 	private Map<String, Scoreboard> playerScoreboards = new HashMap<String, Scoreboard>();
-	
+	private String title;
+
+	public Example(){
+		this.title = ChatColor.translateAlternateColorCodes('&', "&bTitle hiero");
+	}
+
 	public void onEnable(){
 		Bukkit.getPluginManager().registerEvents(this, this);
 	}
@@ -32,7 +37,7 @@ public class Example extends JavaPlugin implements Listener {
 		final Scoreboard board = manager.getNewScoreboard();
 		final Objective o;
 
-		o = board.registerNewObjective("Stats", "dummy");
+		o = board.registerNewObjective((title.length() > 16 ? title.substring(0, 15) : title), "dummy");
 		o.setDisplaySlot(DisplaySlot.SIDEBAR);
 		o.setDisplayName("Migas Gayy");
 
@@ -47,7 +52,7 @@ public class Example extends JavaPlugin implements Listener {
 	public void unregister(Player player) {
 		playerScoreboards.remove(player.getName());
 	}
-	
+
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
